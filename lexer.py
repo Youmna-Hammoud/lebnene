@@ -42,7 +42,7 @@ class TokenType(Enum):
 KEYWORDS = {
     "farjine": TokenType.FARJINE,
     "iza":     TokenType.IZA,
-    "gher hek": TokenType.GHER_HEK,
+    "gherhek": TokenType.GHER_HEK,
     "talama":  TokenType.TALAMA,
     "redele":  TokenType.REDELE,
     "sa7":     TokenType.SA7,

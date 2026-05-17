@@ -6,7 +6,7 @@ A Lebanese programming language.
 |----------|---------|
 | farjine  | print   |
 | iza      | if      |
-| gher hek | else    |
+| gherhek  | else    |
 | talama   | while   |
 | redele   | return  |
 | sa7      | true    |
