@@ -13,8 +13,32 @@ A Lebanese programming language.
 | ghalat   | false   |
 | mashi    | null    |
 
+## Usage
+
+### Run a script
+```bash
+python lebnene.py marhaba.lb
+```
+
+### REPL
+```bash
+python lebnene.py
+> farjine("marhaba")
+```
+
+### Example script: marhaba.lb
+```bash
+farjine("marhaba!")
+iza sa7:
+farjine("kello tamem")
+```
+(the terminal will show tokens at this stage)
+
 ## Status
 - [x] Lexer
 - [ ] Parser
 - [ ] Interpreter
 - [ ] Arduino transpiler
+
+## Based on
+Crafting Interpreters by Robert Nystrom
