@@ -36,7 +36,8 @@ farjine("kello tamem")
 
 ## Status
 - [x] Lexer
-- [ ] Parser
+- [x] Parser
+- [ ] Python transpiler (MVP)
 - [ ] Interpreter
 - [ ] Arduino transpiler
 
