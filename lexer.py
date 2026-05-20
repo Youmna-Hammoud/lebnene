@@ -33,6 +33,9 @@ class TokenType(Enum):
     GREATER = "GREATER"
     LESS = "LESS"
     MISH_EQUALS = "MISH_EQUALS"
+    NEWLINE = "NEWLINE"
+    INDENT = "INDENT"
+    DEDENT = "DEDENT"
 
     # Other
     IDENTIFIER = "IDENTIFIER"
@@ -72,6 +75,7 @@ class Lexer:
         self.start = 0
         self.current = 0
         self.line = 1
+        self.indent_stack = [0]
 
     def scan_tokens(self):
         while not self.is_at_end():
@@ -163,6 +167,8 @@ class Lexer:
             pass
         elif c == '\n':
             self.line += 1
+            self.add_token(TokenType.NEWLINE)
+            self.handle_indent()
 
         # Strings
         elif c == '"':
@@ -212,3 +218,20 @@ class Lexer:
         text = self.source[self.start:self.current]
         token_type = KEYWORDS.get(text, TokenType.IDENTIFIER)
         self.add_token(token_type)
+
+    # add new function to handle indentation
+    def handle_indent(self):
+        indent = 0
+        while self.current < len(self.source) and self.source[self.current] == ' ':
+            indent += 1
+            self.current += 1
+
+        current_indent = self.indent_stack[-1]
+
+        if indent > current_indent:
+            self.indent_stack.append(indent)
+            self.tokens.append(Token(TokenType.INDENT, "", None, self.line))
+        elif indent < current_indent:
+            while self.indent_stack[-1] > indent:
+                self.indent_stack.pop()
+                self.tokens.append(Token(TokenType.DEDENT, "", None, self.line))
