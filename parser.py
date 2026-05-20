@@ -40,10 +40,17 @@ class Parser:
     def parse(self):
         statements = []
         while not self.is_at_end():
-            statements.append(self.statement())
+            stmt = self.statement()
+            if stmt is not None:
+                statements.append(stmt)
         return statements
 
     def statement(self):
+        while self.match(TokenType.NEWLINE):
+            pass
+        
+        if self.is_at_end():
+            return None
         if self.match(TokenType.FARJINE):
             return self.print_statement()
         if self.match(TokenType.IZA):
@@ -78,8 +85,16 @@ class Parser:
         statements = []
         self.expect(TokenType.NEWLINE, "Lezem satr jdid ba3d ':'")
         self.expect(TokenType.INDENT, "Lezem indent")
+        
         while not self.check(TokenType.DEDENT) and not self.is_at_end():
-            statements.append(self.statement())
+            while self.match(TokenType.NEWLINE):  # skip newlines inside block
+                pass
+            if self.check(TokenType.DEDENT) or self.is_at_end():
+                break
+            stmt = self.statement()
+            if stmt is not None:
+                statements.append(stmt)
+                
         self.match(TokenType.DEDENT)
         return statements
 
