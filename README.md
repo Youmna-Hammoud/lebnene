@@ -1,14 +1,31 @@
 # Lebnene 🇱🇧
 A Lebanese programming language.
 
+## Example
+```lb
+x = 42
+farjine("marhaba!")
+ 
+iza x == 42:
+    farjine("sa7, x betsewe 42!")
+gherhek:
+    farjine("mish 42")
+```
+ 
+Output:
+```
+marhaba!
+sa7, x betsewe 42!
+```
+
 ## Keywords
 | Lebanese | English |
 |----------|---------|
 | farjine  | print   |
 | iza      | if      |
 | gherhek  | else    |
-| talama   | while   |
-| redele   | return  |
+| talama   | while   | coming soon
+| redele   | return  | coming soon
 | sa7      | true    |
 | ghalat   | false   |
 | mashi    | null    |
@@ -24,20 +41,21 @@ python lebnene.py marhaba.lb
 ```bash
 python lebnene.py
 > farjine("marhaba")
+marhaba
 ```
-
-### Example script: marhaba.lb
-```bash
-farjine("marhaba!")
-iza sa7:
-farjine("kello tamem")
+ 
+## How it works
 ```
-(the terminal will show tokens at this stage)
+source.lb -> Lexer -> Parser -> Transpiler -> Python -> Output
+```
 
 ## Status
 - [x] Lexer
 - [x] Parser
-- [ ] Python transpiler (MVP)
+- [x] Python transpiler (MVP)
+- [ ] Arithmetic operations
+- [ ] While loops (talama)
+- [ ] Functions (redele/return)
 - [ ] Interpreter
 - [ ] Arduino transpiler
 
