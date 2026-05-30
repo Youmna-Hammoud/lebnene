@@ -1,0 +1,37 @@
+// testing everything implemented in lebnene
+
+// assignment
+x = 42
+name = "youmna"
+flag = sa7
+nothing = mashi
+
+// print
+farjine("marhaba!")
+farjine(x)
+farjine(name)
+farjine(3==4)
+farjine(2==2)
+
+// if with else
+iza x == 42:
+    farjine("x equal 42")
+gherhek:
+    farjine("x mish 42")
+
+// nested if
+iza flag == sa7:
+    iza x == 42:
+        farjine("flag sa7 w x == 42")
+    gherhek:
+        farjine("flag sa7 bas x mish 42")
+
+// comparisons
+iza x > 10:
+    farjine("x kbir")
+
+iza x < 100:
+    farjine("x sghir")
+
+iza flag != ghalat:
+    farjine("mish ghalat")
