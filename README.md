@@ -53,7 +53,7 @@ source.lb -> Lexer -> Parser -> Transpiler -> Python -> Output
 - [x] Lexer
 - [x] Parser
 - [x] Python transpiler (MVP)
-- [ ] Arithmetic operations
+- [x] Arithmetic operations
 - [ ] While loops (talama)
 - [ ] Functions (redele/return)
 - [ ] Interpreter
