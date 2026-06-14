@@ -18,6 +18,8 @@ class Transpiler:
             return self.transpile_assign(stmt)
         if isinstance(stmt, IfStatement):
             return self.transpile_if(stmt)
+        if isinstance(stmt, WhileStatement):
+            return self.transpile_while(stmt)
         raise Exception(f"Ma 3refet shou: {stmt}")
     
     def indent(self):
@@ -72,3 +74,16 @@ class Transpiler:
             return f"{left} {expr.operator.lexeme} {right}"
         
         raise Exception(f"Ma 3refet l expression: {expr}")
+    
+    def transpile_while(self, stmt):
+        condition = self.transpile_expression(stmt.condition)
+        lines = []
+        
+        lines.append(f"{self.indent()}while {condition}:")
+        
+        self.indent_level += 1
+        for s in stmt.body:
+            lines.append(self.transpile_statement(s))
+        self.indent_level -= 1
+        
+        return "\n".join(lines)

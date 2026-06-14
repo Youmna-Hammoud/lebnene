@@ -38,3 +38,11 @@ class IdentifierExpr:
         self.name = name
     def __repr__(self):
         return f"IdentifierExpr({self.name})"
+    
+class WhileStatement:
+    def __init__(self, condition, body):
+        self.condition = condition
+        self.body = body
+    
+    def __repr__(self):
+        return f"WhileStatement({self.condition}, {self.body})"

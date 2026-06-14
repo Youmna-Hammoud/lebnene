@@ -42,3 +42,9 @@ farjine(x)
 farjine(2 + 3 * 4)
 farjine(10 - 4 / 2)
 farjine(x * 2 + 1)
+
+// while loop (talama)
+x = 0
+talama x < 5:
+    farjine(x)
+    x = x + 1

@@ -1,7 +1,7 @@
 from lexer import TokenType
 from ast_nodes import (
     PrintStatement, IfStatement, AssignStatement,
-    BinaryExpr, LiteralExpr, IdentifierExpr
+    BinaryExpr, LiteralExpr, IdentifierExpr, WhileStatement
 )
 
 class Parser:
@@ -55,6 +55,8 @@ class Parser:
             return self.print_statement()
         if self.match(TokenType.IZA):
             return self.if_statement()
+        if self.match(TokenType.TALAMA):
+            return self.while_statement()
         return self.assign_statement()
 
     def print_statement(self):
@@ -147,3 +149,9 @@ class Parser:
             left = BinaryExpr(left, operator, right)
         
         return left
+    
+    def while_statement(self):
+        condition = self.expression()
+        self.expect(TokenType.COLON, "Lezem ':' ba3d talama")
+        body = self.block()
+        return WhileStatement(condition, body)
