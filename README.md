@@ -54,7 +54,7 @@ source.lb -> Lexer -> Parser -> Transpiler -> Python -> Output
 - [x] Parser
 - [x] Python transpiler (MVP)
 - [x] Arithmetic operations
-- [ ] While loops (talama)
+- [x] While loops (talama)
 - [ ] Functions (redele/return)
 - [ ] Interpreter
 - [ ] Arduino transpiler
