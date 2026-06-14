@@ -1,0 +1,17 @@
+// hayda l code bfarjine kif moumken nejma3 ar2am w nesta3mel talama
+
+// 3arref men wen baddak tbalesh
+x = 1
+// l majmou3 abel ma nbalesh
+total = 0
+
+// talama: ebrom 3a kel ra2em men 1 la 5
+talama x < 6:
+    // zid x 3al total
+    total = total + x
+    //rouh 3al ra2em l jey
+    x = x + 1
+
+// farjine l natije
+farjine("majmou3 mn 1 la 5:")
+farjine(total)
