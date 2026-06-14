@@ -102,11 +102,11 @@ class Parser:
         return self.comparison()
 
     def comparison(self):
-        left = self.term()
+        left = self.addition()
         while self.match(TokenType.EQUALS_EQUALS, TokenType.MISH_EQUALS,
                          TokenType.GREATER, TokenType.LESS):
             operator = self.tokens[self.current - 1]
-            right = self.term()
+            right = self.addition()
             left = BinaryExpr(left, operator, right)
         return left
 
@@ -127,3 +127,23 @@ class Parser:
             return IdentifierExpr(self.tokens[self.current - 1].lexeme)
         
         raise SyntaxError(f"[satr {token.line}] Ma 3refet shou: {token.lexeme!r}")
+
+    def addition(self):
+        left = self.multiplication()
+        
+        while self.match(TokenType.PLUS, TokenType.MINUS):
+            operator = self.tokens[self.current - 1]
+            right = self.multiplication()
+            left = BinaryExpr(left, operator, right)
+        
+        return left
+
+    def multiplication(self):
+        left = self.term()
+        
+        while self.match(TokenType.STAR, TokenType.SLASH):
+            operator = self.tokens[self.current - 1]
+            right = self.term()
+            left = BinaryExpr(left, operator, right)
+        
+        return left

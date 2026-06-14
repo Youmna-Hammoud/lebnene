@@ -207,8 +207,10 @@ class Lexer:
             self.advance()
             while self.peek().isdigit():
                 self.advance()
-
-        value = float(self.source[self.start:self.current])
+            value = float(self.source[self.start:self.current])
+        else:
+            value = int(self.source[self.start:self.current])
+        
         self.add_token(TokenType.RA2EM, value)
 
     def identifier(self):

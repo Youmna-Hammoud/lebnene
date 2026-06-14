@@ -61,8 +61,6 @@ class Transpiler:
                 return "False"
             if expr.value is None:
                 return "None"
-            if isinstance(expr.value, float) and expr.value.is_integer():
-                return str(int(expr.value))
             return str(expr.value)
         
         if isinstance(expr, IdentifierExpr):

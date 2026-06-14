@@ -35,3 +35,10 @@ iza x < 100:
 
 iza flag != ghalat:
     farjine("mish ghalat")
+
+//arithmetic 
+x = 2 + 3
+farjine(x)
+farjine(2 + 3 * 4)
+farjine(10 - 4 / 2)
+farjine(x * 2 + 1)
