@@ -1,5 +1,7 @@
 # Lebnene 🇱🇧
-A Lebanese programming language.
+An educational programming language with Lebanese Arabic syntax.
+
+Lebnene is a programming language implemented in Python to explore language design through lexing, parsing, AST construction, and interpretation.
 
 ## Example
 ```lb
@@ -24,8 +26,9 @@ sa7, x betsewe 42!
 | farjine  | print   |
 | iza      | if      |
 | gherhek  | else    |
-| talama   | while   | coming soon
-| redele   | return  | coming soon
+| talama   | while   |
+| 3arref   | def     |
+| redele   | return  |
 | sa7      | true    |
 | ghalat   | false   |
 | mashi    | null    |
@@ -46,16 +49,19 @@ marhaba
  
 ## How it works
 ```
-source.lb -> Lexer -> Parser -> Transpiler -> Python -> Output
+source.lb -> Lexer -> Parser -> Transpiler -> Python -> Output (MVP)
 ```
 
 ## Status
+
+Current MVP: v0.1-mvp
+
 - [x] Lexer
 - [x] Parser
 - [x] Python transpiler (MVP)
 - [x] Arithmetic operations
 - [x] While loops (talama)
-- [ ] Functions (redele/return)
+- [x] Functions (redele/return)
 - [ ] Interpreter
 - [ ] Arduino transpiler
 
