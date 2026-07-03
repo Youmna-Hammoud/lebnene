@@ -46,3 +46,27 @@ class WhileStatement:
     
     def __repr__(self):
         return f"WhileStatement({self.condition}, {self.body})"
+    
+class FunctionDef:
+    def __init__(self, name, params, body):
+        self.name = name
+        self.params = params
+        self.body = body        # list of statements
+    
+    def __repr__(self):
+        return f"FunctionDef({self.name}, {self.params}, {self.body})"
+
+class CallExpr:
+    def __init__(self, name, args):
+        self.name = name 
+        self.args = args        # list of expressions
+    
+    def __repr__(self):
+        return f"CallExpr({self.name}, {self.args})"
+
+class ReturnStatement:
+    def __init__(self, value):
+        self.value = value      # expression to return
+    
+    def __repr__(self):
+        return f"ReturnStatement({self.value})"

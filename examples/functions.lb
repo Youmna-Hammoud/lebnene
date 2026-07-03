@@ -1,0 +1,17 @@
+// 3arref function tjme3 3adayn
+3arref sum(x, y):
+    redele x + y
+
+// 3arref function tbayyin iza l 3adad kbir
+3arref is_big(n):
+    iza n > 100:
+        redele sa7
+    gherhek:
+        redele ghalat
+
+// esta3mel l functioneteyn
+result = sum(10, 32)
+farjine(result)
+
+farjine(is_big(150))
+farjine(is_big(50))

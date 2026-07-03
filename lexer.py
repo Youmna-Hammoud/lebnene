@@ -11,6 +11,7 @@ class TokenType(Enum):
     GHER_HEK = "GHER_HEK" # else
     TALAMA = "TALAMA"     # while
     REDELE = "REDELE"     # return
+    ARREF = "ARREF"       # function definition
     SA7 = "SA7"           # true
     GHALAT = "GHALAT"     # false
     MASHI = "MASHI"       # null
@@ -36,6 +37,7 @@ class TokenType(Enum):
     NEWLINE = "NEWLINE"
     INDENT = "INDENT"
     DEDENT = "DEDENT"
+    COMMA = "COMMA"
 
     # Other
     IDENTIFIER = "IDENTIFIER"
@@ -48,6 +50,7 @@ KEYWORDS = {
     "gherhek": TokenType.GHER_HEK,
     "talama":  TokenType.TALAMA,
     "redele":  TokenType.REDELE,
+    "3arref":  TokenType.ARREF,
     "sa7":     TokenType.SA7,
     "ghalat":  TokenType.GHALAT,
     "mashi":   TokenType.MASHI,
@@ -137,6 +140,8 @@ class Lexer:
             self.add_token(TokenType.MINUS)
         elif c == '*':
             self.add_token(TokenType.STAR)
+        elif c == ',':
+            self.add_token(TokenType.COMMA)
 
         # Two character symbols
         elif c == '=':
@@ -176,7 +181,10 @@ class Lexer:
 
         # Numbers
         elif c.isdigit():
-            self.number()
+            if self.peek().isalpha() or self.peek() == '_':
+                self.identifier()
+            else:
+                self.number()
 
         # Identifiers and keywords
         elif c.isalpha() or c == '_':

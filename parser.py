@@ -1,7 +1,7 @@
 from lexer import TokenType
 from ast_nodes import (
     PrintStatement, IfStatement, AssignStatement,
-    BinaryExpr, LiteralExpr, IdentifierExpr, WhileStatement
+    BinaryExpr, LiteralExpr, IdentifierExpr, WhileStatement, FunctionDef, CallExpr, ReturnStatement
 )
 
 class Parser:
@@ -57,6 +57,10 @@ class Parser:
             return self.if_statement()
         if self.match(TokenType.TALAMA):
             return self.while_statement()
+        if self.match(TokenType.ARREF):
+            return self.function_def()
+        if self.match(TokenType.REDELE):
+            return self.return_statement()
         return self.assign_statement()
 
     def print_statement(self):
@@ -126,7 +130,10 @@ class Parser:
         if self.match(TokenType.MASHI):
             return LiteralExpr(None)
         if self.match(TokenType.IDENTIFIER):
-            return IdentifierExpr(self.tokens[self.current - 1].lexeme)
+            name = self.tokens[self.current - 1].lexeme
+            if self.match(TokenType.LPAREN):      # is it a call?
+                return self.call_expr(name)
+            return IdentifierExpr(name)
         
         raise SyntaxError(f"[satr {token.line}] Ma 3refet shou: {token.lexeme!r}")
 
@@ -155,3 +162,33 @@ class Parser:
         self.expect(TokenType.COLON, "Lezem ':' ba3d talama")
         body = self.block()
         return WhileStatement(condition, body)
+    
+    def function_def(self):
+        name = self.expect(TokenType.IDENTIFIER, "Lezem ism l function")
+        self.expect(TokenType.LPAREN, "Lezem '(' ba3d ism l function")
+
+        params = []
+        if not self.check(TokenType.RPAREN):
+            params.append(self.expect(TokenType.IDENTIFIER, "Lezem ism l parameter").lexeme)
+            while self.match(TokenType.COMMA):
+                params.append(self.expect(TokenType.IDENTIFIER, "Lezem ism l parameter").lexeme)
+
+        self.expect(TokenType.RPAREN, "Lezem ')' ba3d l parameters")
+        self.expect(TokenType.COLON, "Lezem ':' ba3d l function")
+        body = self.block()
+
+        return FunctionDef(name.lexeme, params, body)
+
+    def return_statement(self):
+        value = self.expression()
+        return ReturnStatement(value)
+
+    def call_expr(self, name):
+        args = []
+        if not self.check(TokenType.RPAREN):
+            args.append(self.expression())
+            while self.match(TokenType.COMMA):
+                args.append(self.expression())
+        
+        self.expect(TokenType.RPAREN, "Lezem ')' ba3d l arguments")
+        return CallExpr(name, args)
