@@ -1,0 +1,21 @@
+// testing lists, indexing, and la (for) loops
+
+ra2am = [10, 20, 30, 40]
+
+farjine(ra2am)
+farjine(ra2am[0])
+farjine(ra2am[-1])
+
+total = 0
+la x, ra2am:
+    total += x
+farjine(total)
+
+// elif chain
+la x, ra2am:
+    iza x % 20 == 0:
+        farjine("mi2sam 3ala 20")
+    gherhek iza x >= 30:
+        farjine("kbir")
+    gherhek:
+        farjine("sghir")

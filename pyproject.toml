@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lebnene"
+version = "0.1.0"
+description = "An educational programming language with Lebanese Arabic syntax"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { file = "LICENSE" }
+authors = [{ name = "Lebnene" }]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Software Development :: Interpreters",
+    "Topic :: Software Development :: Compilers",
+    "Intended Audience :: Education",
+]
+
+[project.urls]
+Repository = "https://github.com/Youmna-Hammoud/lebnene"
+
+[project.scripts]
+lebnene = "lebnene:main"
+
+[tool.setuptools]
+py-modules = ["lebnene", "lexer", "parser", "ast_nodes", "transpiler", "interpreter", "errors"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
