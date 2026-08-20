@@ -13,11 +13,12 @@ class IfStatement:
         return f"IfStatement({self.condition}, {self.body}, {self.else_body})"
 
 class AssignStatement:
-    def __init__(self, name, value):
+    def __init__(self, name, value, operator="="):
         self.name = name
         self.value = value
+        self.operator = operator
     def __repr__(self):
-        return f"AssignStatement({self.name}, {self.value})"
+        return f"AssignStatement({self.name}, {self.operator}, {self.value})"
 
 class BinaryExpr:
     def __init__(self, left, operator, right):
@@ -38,6 +39,34 @@ class IdentifierExpr:
         self.name = name
     def __repr__(self):
         return f"IdentifierExpr({self.name})"
+
+class UnaryExpr:
+    def __init__(self, operator, operand):
+        self.operator = operator
+        self.operand = operand
+    def __repr__(self):
+        return f"UnaryExpr({self.operator.lexeme}, {self.operand})"
+
+class ListExpr:
+    def __init__(self, elements):
+        self.elements = elements
+    def __repr__(self):
+        return f"ListExpr({self.elements})"
+
+class IndexExpr:
+    def __init__(self, target, index):
+        self.target = target
+        self.index = index
+    def __repr__(self):
+        return f"IndexExpr({self.target}, {self.index})"
+
+class ForStatement:
+    def __init__(self, var_name, iterable, body):
+        self.var_name = var_name
+        self.iterable = iterable
+        self.body = body        # list of statements
+    def __repr__(self):
+        return f"ForStatement({self.var_name}, {self.iterable}, {self.body})"
     
 class WhileStatement:
     def __init__(self, condition, body):

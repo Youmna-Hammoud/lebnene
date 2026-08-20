@@ -1,5 +1,7 @@
 from enum import Enum
 
+from errors import LebneneError
+
 class TokenType(Enum):
     # Types
     RA2EM = "RA2EM"       # number
@@ -10,6 +12,7 @@ class TokenType(Enum):
     IZA = "IZA"           # if
     GHER_HEK = "GHER_HEK" # else
     TALAMA = "TALAMA"     # while
+    LA = "LA"             # for
     REDELE = "REDELE"     # return
     ARREF = "ARREF"       # function definition
     SA7 = "SA7"           # true
@@ -24,6 +27,8 @@ class TokenType(Enum):
     RPAREN = "RPAREN"
     LBRACE = "LBRACE"
     RBRACE = "RBRACE"
+    LBRACKET = "LBRACKET"
+    RBRACKET = "RBRACKET"
     COLON = "COLON"
     EQUALS = "EQUALS"
     EQUALS_EQUALS = "EQUALS_EQUALS"
@@ -33,7 +38,14 @@ class TokenType(Enum):
     SLASH = "SLASH"
     GREATER = "GREATER"
     LESS = "LESS"
+    GREATER_EQUALS = "GREATER_EQUALS"
+    LESS_EQUALS = "LESS_EQUALS"
     MISH_EQUALS = "MISH_EQUALS"
+    MOD = "MOD"
+    PLUS_EQUALS = "PLUS_EQUALS"
+    MINUS_EQUALS = "MINUS_EQUALS"
+    STAR_EQUALS = "STAR_EQUALS"
+    SLASH_EQUALS = "SLASH_EQUALS"
     NEWLINE = "NEWLINE"
     INDENT = "INDENT"
     DEDENT = "DEDENT"
@@ -49,6 +61,7 @@ KEYWORDS = {
     "iza":     TokenType.IZA,
     "gherhek": TokenType.GHER_HEK,
     "talama":  TokenType.TALAMA,
+    "la":      TokenType.LA,
     "redele":  TokenType.REDELE,
     "3arref":  TokenType.ARREF,
     "sa7":     TokenType.SA7,
@@ -58,6 +71,28 @@ KEYWORDS = {
     "aw":      TokenType.AW,
     "mish":    TokenType.MISH,
 }
+
+
+ESCAPES = {
+    'n': '\n',
+    't': '\t',
+    '"': '"',
+    '\\': '\\',
+}
+
+
+def unescape(raw):
+    result = []
+    i = 0
+    while i < len(raw):
+        c = raw[i]
+        if c == '\\' and i + 1 < len(raw) and raw[i + 1] in ESCAPES:
+            result.append(ESCAPES[raw[i + 1]])
+            i += 2
+        else:
+            result.append(c)
+            i += 1
+    return "".join(result)
 
 
 class Token:
@@ -132,38 +167,46 @@ class Lexer:
             self.add_token(TokenType.LBRACE)
         elif c == '}':
             self.add_token(TokenType.RBRACE)
+        elif c == '[':
+            self.add_token(TokenType.LBRACKET)
+        elif c == ']':
+            self.add_token(TokenType.RBRACKET)
         elif c == ':':
             self.add_token(TokenType.COLON)
-        elif c == '+':
-            self.add_token(TokenType.PLUS)
-        elif c == '-':
-            self.add_token(TokenType.MINUS)
-        elif c == '*':
-            self.add_token(TokenType.STAR)
         elif c == ',':
             self.add_token(TokenType.COMMA)
+        elif c == '%':
+            self.add_token(TokenType.MOD)
 
         # Two character symbols
+        elif c == '+':
+            self.add_token(TokenType.PLUS_EQUALS if self.match('=') else TokenType.PLUS)
+        elif c == '-':
+            self.add_token(TokenType.MINUS_EQUALS if self.match('=') else TokenType.MINUS)
+        elif c == '*':
+            self.add_token(TokenType.STAR_EQUALS if self.match('=') else TokenType.STAR)
         elif c == '=':
             self.add_token(
                 TokenType.EQUALS_EQUALS if self.match('=')
                 else TokenType.EQUALS
             )
         elif c == '!':
-            self.add_token(
-                TokenType.MISH_EQUALS if self.match('=')
-                else None  # standalone is not used
-            )
+            if self.match('='):
+                self.add_token(TokenType.MISH_EQUALS)
+            else:
+                self.error(f"Ma 3refet shou: {c!r}")
         elif c == '>':
-            self.add_token(TokenType.GREATER)
+            self.add_token(TokenType.GREATER_EQUALS if self.match('=') else TokenType.GREATER)
         elif c == '<':
-            self.add_token(TokenType.LESS)
+            self.add_token(TokenType.LESS_EQUALS if self.match('=') else TokenType.LESS)
 
-        # Comments
+        # Comments / slash / compound-assign
         elif c == '/':
             if self.match('/'):
                 while self.peek() != '\n' and not self.is_at_end():
                     self.advance()
+            elif self.match('='):
+                self.add_token(TokenType.SLASH_EQUALS)
             else:
                 self.add_token(TokenType.SLASH)
 
@@ -194,7 +237,11 @@ class Lexer:
             self.error(f"Ma 3refet shou: {c!r}")
 
     def string(self):
-        while self.peek() != '"' and not self.is_at_end():
+        while not self.is_at_end() and self.peek() != '"':
+            if self.peek() == '\\' and self.peek_next() != '\0':
+                self.advance()  # backslash
+                self.advance()  # escaped character, taken as-is (even if it's a quote)
+                continue
             if self.peek() == '\n':
                 self.line += 1
             self.advance()
@@ -204,7 +251,8 @@ class Lexer:
             return
 
         self.advance()  # closing "
-        value = self.source[self.start + 1:self.current - 1]
+        raw = self.source[self.start + 1:self.current - 1]
+        value = unescape(raw)
         self.add_token(TokenType.KELME, value)
 
     def number(self):
@@ -232,7 +280,7 @@ class Lexer:
     # add new function to handle indentation
     def handle_indent(self):
         indent = 0
-        while self.current < len(self.source) and self.source[self.current] == ' ':
+        while self.current < len(self.source) and self.source[self.current] in (' ', '\t'):
             indent += 1
             self.current += 1
 
@@ -245,3 +293,7 @@ class Lexer:
             while self.indent_stack[-1] > indent:
                 self.indent_stack.pop()
                 self.tokens.append(Token(TokenType.DEDENT, "", None, self.line))
+            if self.indent_stack[-1] != indent:
+                raise LebneneError(
+                    "Indentation mish mtabi2a (inconsistent indentation)", self.line
+                )

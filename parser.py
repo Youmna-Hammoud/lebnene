@@ -1,7 +1,9 @@
 from lexer import TokenType
+from errors import LebneneError
 from ast_nodes import (
     PrintStatement, IfStatement, AssignStatement,
-    BinaryExpr, LiteralExpr, IdentifierExpr, WhileStatement, FunctionDef, CallExpr, ReturnStatement
+    BinaryExpr, LiteralExpr, IdentifierExpr, WhileStatement, FunctionDef, CallExpr, ReturnStatement,
+    UnaryExpr, ListExpr, IndexExpr, ForStatement
 )
 
 class Parser:
@@ -35,7 +37,7 @@ class Parser:
     def expect(self, type, message):
         if self.check(type):
             return self.advance()
-        raise SyntaxError(f"[satr {self.peek().line}] {message}")
+        raise LebneneError(message, self.peek().line)
     
     def parse(self):
         statements = []
@@ -57,6 +59,8 @@ class Parser:
             return self.if_statement()
         if self.match(TokenType.TALAMA):
             return self.while_statement()
+        if self.match(TokenType.LA):
+            return self.for_statement()
         if self.match(TokenType.ARREF):
             return self.function_def()
         if self.match(TokenType.REDELE):
@@ -76,16 +80,26 @@ class Parser:
         
         else_body = None
         if self.match(TokenType.GHER_HEK):
-            self.expect(TokenType.COLON, "Lezem ':' ba3d gherhek")
-            else_body = self.block()
-        
+            if self.match(TokenType.IZA):
+                else_body = [self.if_statement()]  # gherhek iza ... == elif
+            else:
+                self.expect(TokenType.COLON, "Lezem ':' ba3d gherhek")
+                else_body = self.block()
+
         return IfStatement(condition, body, else_body)
+
+    ASSIGN_OPERATORS = (
+        TokenType.EQUALS, TokenType.PLUS_EQUALS, TokenType.MINUS_EQUALS,
+        TokenType.STAR_EQUALS, TokenType.SLASH_EQUALS,
+    )
 
     def assign_statement(self):
         name = self.expect(TokenType.IDENTIFIER, "Lezem identifier")
-        self.expect(TokenType.EQUALS, "Lezem '='")
+        if not self.match(*self.ASSIGN_OPERATORS):
+            raise LebneneError("Lezem '='", self.peek().line)
+        operator = self.tokens[self.current - 1].lexeme
         value = self.expression()
-        return AssignStatement(name.lexeme, value)
+        return AssignStatement(name.lexeme, value, operator)
 
     def block(self):
         statements = []
@@ -105,20 +119,60 @@ class Parser:
         return statements
 
     def expression(self):
+        return self.logic_or()
+
+    def logic_or(self):
+        left = self.logic_and()
+        while self.match(TokenType.AW):
+            operator = self.tokens[self.current - 1]
+            right = self.logic_and()
+            left = BinaryExpr(left, operator, right)
+        return left
+
+    def logic_and(self):
+        left = self.logic_not()
+        while self.match(TokenType.W):
+            operator = self.tokens[self.current - 1]
+            right = self.logic_not()
+            left = BinaryExpr(left, operator, right)
+        return left
+
+    def logic_not(self):
+        if self.match(TokenType.MISH):
+            operator = self.tokens[self.current - 1]
+            operand = self.logic_not()
+            return UnaryExpr(operator, operand)
         return self.comparison()
 
     def comparison(self):
         left = self.addition()
         while self.match(TokenType.EQUALS_EQUALS, TokenType.MISH_EQUALS,
-                         TokenType.GREATER, TokenType.LESS):
+                         TokenType.GREATER, TokenType.LESS,
+                         TokenType.GREATER_EQUALS, TokenType.LESS_EQUALS):
             operator = self.tokens[self.current - 1]
             right = self.addition()
             left = BinaryExpr(left, operator, right)
         return left
 
     def term(self):
+        expr = self.primary()
+        while self.match(TokenType.LBRACKET):
+            index = self.expression()
+            self.expect(TokenType.RBRACKET, "Lezem ']' ba3d l index")
+            expr = IndexExpr(expr, index)
+        return expr
+
+    def primary(self):
         token = self.peek()
-        
+
+        if self.match(TokenType.LBRACKET):
+            elements = []
+            if not self.check(TokenType.RBRACKET):
+                elements.append(self.expression())
+                while self.match(TokenType.COMMA):
+                    elements.append(self.expression())
+            self.expect(TokenType.RBRACKET, "Lezem ']' ba3d l list")
+            return ListExpr(elements)
         if self.match(TokenType.KELME):
             return LiteralExpr(self.tokens[self.current - 1].value)
         if self.match(TokenType.RA2EM):
@@ -134,8 +188,8 @@ class Parser:
             if self.match(TokenType.LPAREN):      # is it a call?
                 return self.call_expr(name)
             return IdentifierExpr(name)
-        
-        raise SyntaxError(f"[satr {token.line}] Ma 3refet shou: {token.lexeme!r}")
+
+        raise LebneneError(f"Ma 3refet shou: {token.lexeme!r}", token.line)
 
     def addition(self):
         left = self.multiplication()
@@ -148,21 +202,36 @@ class Parser:
         return left
 
     def multiplication(self):
-        left = self.term()
-        
-        while self.match(TokenType.STAR, TokenType.SLASH):
+        left = self.unary()
+
+        while self.match(TokenType.STAR, TokenType.SLASH, TokenType.MOD):
             operator = self.tokens[self.current - 1]
-            right = self.term()
+            right = self.unary()
             left = BinaryExpr(left, operator, right)
-        
+
         return left
-    
+
+    def unary(self):
+        if self.match(TokenType.MINUS):
+            operator = self.tokens[self.current - 1]
+            operand = self.unary()
+            return UnaryExpr(operator, operand)
+        return self.term()
+
     def while_statement(self):
         condition = self.expression()
         self.expect(TokenType.COLON, "Lezem ':' ba3d talama")
         body = self.block()
         return WhileStatement(condition, body)
-    
+
+    def for_statement(self):
+        name = self.expect(TokenType.IDENTIFIER, "Lezem ism l variable ba3d la")
+        self.expect(TokenType.COMMA, "Lezem ',' ba3d ism l variable")
+        iterable = self.expression()
+        self.expect(TokenType.COLON, "Lezem ':' ba3d l iterable")
+        body = self.block()
+        return ForStatement(name.lexeme, iterable, body)
+
     def function_def(self):
         name = self.expect(TokenType.IDENTIFIER, "Lezem ism l function")
         self.expect(TokenType.LPAREN, "Lezem '(' ba3d ism l function")
